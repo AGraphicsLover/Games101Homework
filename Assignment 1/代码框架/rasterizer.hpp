@@ -57,6 +57,7 @@ class rasterizer
     void set_model(const Eigen::Matrix4f& m);
     void set_view(const Eigen::Matrix4f& v);
     void set_projection(const Eigen::Matrix4f& p);
+    void set_Rodrigues(const Eigen::Matrix4f& r);
 
     void set_pixel(const Eigen::Vector3f& point, const Eigen::Vector3f& color);
 
@@ -74,6 +75,7 @@ class rasterizer
     Eigen::Matrix4f model;
     Eigen::Matrix4f view;
     Eigen::Matrix4f projection;
+    Eigen::Matrix4f Rodrigues;
 
     std::map<int, std::vector<Eigen::Vector3f>> pos_buf;
     std::map<int, std::vector<Eigen::Vector3i>> ind_buf;

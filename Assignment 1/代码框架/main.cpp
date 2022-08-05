@@ -73,71 +73,113 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
     return projection;
 }
 
+Eigen::Matrix4f get_rotation(Vector3f axis, float angle)
+{
+    Eigen::Matrix4f Rodri = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f I = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f N = Eigen::Matrix4f::Identity();
+    Eigen::Vector4f raxis;
+
+    raxis << axis.x(),axis.y(),axis.z(),0;
+
+    N << 0,-axis.z(),axis.y(),0,
+            axis.z(),0,-axis.x(),0,
+            -axis.y(),axis.x(),0,0,
+            0,0,0,1;
+
+    double rotate_angle = angle/180.0*MY_PI;
+    Rodri = cos(rotate_angle)*I+(1-cos(rotate_angle)) * raxis * raxis.transpose() + sin(rotate_angle)*N;
+    Rodri(3,3) = 1;
+    return Rodri;
+}
+
 int main(int argc, const char** argv)
 {
     float angle = 0;
-    bool command_line = false;
+    bool command_line = false;  //定义命令行开关标志，默认为关
     std::string filename = "output.png";
 
-    if (argc >= 3) {
+    Eigen::Vector3f rotated_axis(0,0,1);
+    float rangle = 0, ra;
+
+    if (argc >= 3) {  //接收到的参数大于三个，即检测到通过命令行传入参数时
         command_line = true;
         angle = std::stof(argv[2]); // -r by default
-        if (argc == 4) {
+        if (argc == 4) {  //接收到的参数为四个，那么说明命令行输入了文件名参数
             filename = std::string(argv[3]);
         }
     }
 
-    rst::rasterizer r(700, 700);
+    rst::rasterizer r(700, 700);  //设定700*700像素的光栅器视口
 
-    Eigen::Vector3f eye_pos = {0, 0, 5};
+    Eigen::Vector3f eye_pos = {0, 0, 5};  //设定相机位置
 
     std::vector<Eigen::Vector3f> pos{{2, 0, -2}, {0, 2, -2}, {-2, 0, -2}};
 
-    std::vector<Eigen::Vector3i> ind{{0, 1, 2}};
+    std::vector<Eigen::Vector3i> ind{{0, 1, 2}};  //设定三顶点序号,用于画图时确定需要处理几个顶点，这里表示的是三个顶点
 
     auto pos_id = r.load_positions(pos);
-    auto ind_id = r.load_indices(ind);
+    auto ind_id = r.load_indices(ind);  //保存多个图形的顶点和序号，本次作业只涉及一个图形
 
-    int key = 0;
-    int frame_count = 0;
+    int key = 0;  //键盘输入
+    int frame_count = 0;  //帧序号
 
-    if (command_line) {
-        r.clear(rst::Buffers::Color | rst::Buffers::Depth);
+    if (command_line) { //如果命令行开关标志为开（这一段代码是为了应用命令行传入的参数，比如初始角度和文件名）
+        r.clear(rst::Buffers::Color | rst::Buffers::Depth);  //初始化帧缓存和深度缓存（本次作业本次作业只涉及一个图形，所以不涉及深度）
 
         r.set_model(get_model_matrix(angle));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
+        r.set_Rodrigues(get_rotation(rotated_axis, rangle));
 
         r.draw(pos_id, ind_id, rst::Primitive::Triangle);
         cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
         image.convertTo(image, CV_8UC3, 1.0f);
-
         cv::imwrite(filename, image);
 
         return 0;
     }
 
-    while (key != 27) {
-        r.clear(rst::Buffers::Color | rst::Buffers::Depth);
+    bool rFlag = false;
 
+    std::cout << "please enter the axis and the angle: "<< std::endl;
+    std::cin >> rotated_axis.x() >> rotated_axis.y() >> rotated_axis.z() >> ra;
+
+    while (key != 27) {  //只要没有检测到按下ESC就循环(ESC的ASCII码是27)
+        r.clear(rst::Buffers::Color | rst::Buffers::Depth);
         r.set_model(get_model_matrix(angle));
         r.set_view(get_view_matrix(eye_pos));
         r.set_projection(get_projection_matrix(45, 1, 0.1, 50));
 
+        if(rFlag)
+            r.set_Rodrigues(get_rotation(rotated_axis,rangle));
+        else
+            r.set_Rodrigues(get_rotation({0,0,1},0));
+        
         r.draw(pos_id, ind_id, rst::Primitive::Triangle);
 
         cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
         image.convertTo(image, CV_8UC3, 1.0f);
-        cv::imshow("image", image);
+        cv::imshow("image", image);  //显示图像
         key = cv::waitKey(10);
 
-        std::cout << "frame count: " << frame_count++ << '\n';
+        std::cout << "frame count: " << frame_count++ << '\n';  //显示当前是第几帧画面
 
-        if (key == 'a') {
+        if (key == 'a') {  //按下a，逆时针旋转10°
             angle += 10;
         }
-        else if (key == 'd') {
+        else if (key == 'd') {  //按下d，顺时针旋转10°
             angle -= 10;
+        }
+        else if (key == 'e')  //按下r，绕给定旋转轴旋转ra°
+        {
+            rFlag = true;
+            rangle += ra;
+        }
+        else if (key == 'q')  //按下r，绕给定旋转轴反向旋转ra°
+        {
+            rFlag = true;
+            rangle -= ra;
         }
     }
 

@@ -27,7 +27,7 @@ rst::ind_buf_id rst::rasterizer::load_indices(const std::vector<Eigen::Vector3i>
 
 // Bresenham's line drawing algorithm
 // Code taken from a stack overflow answer: https://stackoverflow.com/a/16405254
-void rst::rasterizer::draw_line(Eigen::Vector3f begin, Eigen::Vector3f end)
+void rst::rasterizer::draw_line(Eigen::Vector3f begin, Eigen::Vector3f end)  //直线扫描画线，这段代码的原理是用的中点画线算法
 {
     auto x1 = begin.x();
     auto y1 = begin.y();
@@ -45,7 +45,7 @@ void rst::rasterizer::draw_line(Eigen::Vector3f begin, Eigen::Vector3f end)
     px=2*dy1-dx1;
     py=2*dx1-dy1;
 
-    if(dy1<=dx1)
+    if(dy1<=dx1)  //如果线段斜率的绝对值小于等于1就执行下列代码，这样区分是因为像素点坐标是整数，而如果斜率的绝对值小于1，在对线段进行采样时，每次x坐标加1，y坐标要么是加1，要么是减1，要么不变，简化了计算，而当斜率的绝对值大于1时，斜率的倒数的绝对值就小于1，就可以每次对y坐标加1,也是一样的效果
     {
         if(dx>=0)
         {
@@ -144,7 +144,7 @@ void rst::rasterizer::draw(rst::pos_buf_id pos_buffer, rst::ind_buf_id ind_buffe
     float f1 = (100 - 0.1) / 2.0;
     float f2 = (100 + 0.1) / 2.0;
 
-    Eigen::Matrix4f mvp = projection * view * model;
+    Eigen::Matrix4f mvp = projection * view * model * Rodrigues;
     for (auto& i : ind)
     {
         Triangle t;
@@ -159,7 +159,7 @@ void rst::rasterizer::draw(rst::pos_buf_id pos_buffer, rst::ind_buf_id ind_buffe
             vec /= vec.w();
         }
 
-        for (auto & vert : v)
+        for (auto & vert : v)  //这个for循环是视口变换
         {
             vert.x() = 0.5*width*(vert.x()+1.0);
             vert.y() = 0.5*height*(vert.y()+1.0);
@@ -181,7 +181,7 @@ void rst::rasterizer::draw(rst::pos_buf_id pos_buffer, rst::ind_buf_id ind_buffe
     }
 }
 
-void rst::rasterizer::rasterize_wireframe(const Triangle& t)
+void rst::rasterizer::rasterize_wireframe(const Triangle& t)  //画出三角形的框架（三条边）
 {
     draw_line(t.c(), t.a());
     draw_line(t.c(), t.b());
@@ -203,7 +203,12 @@ void rst::rasterizer::set_projection(const Eigen::Matrix4f& p)
     projection = p;
 }
 
-void rst::rasterizer::clear(rst::Buffers buff)
+void rst::rasterizer::set_Rodrigues(const Eigen::Matrix4f& r)
+{
+    Rodrigues = r;
+}
+
+void rst::rasterizer::clear(rst::Buffers buff) //初始化，设置帧缓冲内所有像素颜色为（0，0，0），深度缓冲的所有像素深度为无限大
 {
     if ((buff & rst::Buffers::Color) == rst::Buffers::Color)
     {
@@ -215,18 +220,18 @@ void rst::rasterizer::clear(rst::Buffers buff)
     }
 }
 
-rst::rasterizer::rasterizer(int w, int h) : width(w), height(h)
+rst::rasterizer::rasterizer(int w, int h) : width(w), height(h)  //根据宽高比设置帧缓冲大小和深度缓冲大小（大小就是像素个数）
 {
     frame_buf.resize(w * h);
     depth_buf.resize(w * h);
 }
 
-int rst::rasterizer::get_index(int x, int y)
+int rst::rasterizer::get_index(int x, int y)  //根据坐标求像素在缓冲区的序号
 {
     return (height-y)*width + x;
 }
 
-void rst::rasterizer::set_pixel(const Eigen::Vector3f& point, const Eigen::Vector3f& color)
+void rst::rasterizer::set_pixel(const Eigen::Vector3f& point, const Eigen::Vector3f& color) //将屏幕像素点 (x, y) 设 为 (r, g, b) 的颜色，并写入相应的帧缓冲区位置
 {
     //old index: auto ind = point.y() + point.x() * width;
     if (point.x() < 0 || point.x() >= width ||
