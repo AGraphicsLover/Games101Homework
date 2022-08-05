@@ -87,7 +87,23 @@ Eigen::Matrix4f get_rotation(Vector3f axis, float angle)
     double rotate_angle = angle/180.0*MY_PI;
     Rodri3f = cos(rotate_angle)*I+(1-cos(rotate_angle)) * axis * axis.transpose() + sin(rotate_angle)*N;
     Rodri4f.block(0,0,3,3) = Rodri3f;
+    Rodri4f(3,3)=1;
     return Rodri4f;
+    /*Eigen::Matrix4f Rodri = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f I = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f N = Eigen::Matrix4f::Identity();
+    Eigen::Vector4f raxis;
+    
+    double rotate_angle = angle/180.0*MY_PI;
+    raxis << axis.x(),axis.y(),axis.z(),0;
+
+    N << 0,-axis.z(),axis.y(),0,
+            axis.z(),0,-axis.x(),0,
+            -axis.y(),axis.x(),0,0,
+            0,0,0,1;
+    Rodri = cos(rotate_angle)*I+(1-cos(rotate_angle)) * raxis * raxis.transpose() + sin(rotate_angle)*N;
+    Rodri(3,3)=1;
+    return Rodri;*/
 }
 
 int main(int argc, const char** argv)
