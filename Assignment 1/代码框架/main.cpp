@@ -75,22 +75,19 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 
 Eigen::Matrix4f get_rotation(Vector3f axis, float angle)
 {
-    Eigen::Matrix4f Rodri = Eigen::Matrix4f::Identity();
-    Eigen::Matrix4f I = Eigen::Matrix4f::Identity();
-    Eigen::Matrix4f N = Eigen::Matrix4f::Identity();
-    Eigen::Vector4f raxis;
+    Eigen::Matrix4f Rodri4f = Eigen::Matrix4f::Identity();
+    Eigen::Matrix3f Rodri3f = Eigen::Matrix3f::Identity();
+    Eigen::Matrix3f I = Eigen::Matrix3f::Identity();
+    Eigen::Matrix3f N = Eigen::Matrix3f::Identity();
 
-    raxis << axis.x(),axis.y(),axis.z(),0;
-
-    N << 0,-axis.z(),axis.y(),0,
-            axis.z(),0,-axis.x(),0,
-            -axis.y(),axis.x(),0,0,
-            0,0,0,1;
+    N << 0,-axis.z(),axis.y(),
+            axis.z(),0,-axis.x(),
+            -axis.y(),axis.x(),0;
 
     double rotate_angle = angle/180.0*MY_PI;
-    Rodri = cos(rotate_angle)*I+(1-cos(rotate_angle)) * raxis * raxis.transpose() + sin(rotate_angle)*N;
-    Rodri(3,3) = 1;
-    return Rodri;
+    Rodri3f = cos(rotate_angle)*I+(1-cos(rotate_angle)) * axis * axis.transpose() + sin(rotate_angle)*N;
+    Rodri4f.block(0,0,3,3) = Rodri3f;
+    return Rodri4f;
 }
 
 int main(int argc, const char** argv)
@@ -143,7 +140,7 @@ int main(int argc, const char** argv)
     bool rFlag = false;
 
     std::cout << "please enter the axis and the angle: "<< std::endl;
-    std::cin >> rotated_axis.x() >> rotated_axis.y() >> rotated_axis.z() >> ra;
+    std::cin >> rotated_axis.x() >> rotated_axis.y() >> rotated_axis.z() >> ra;  //定义罗德里格斯旋转轴和角
 
     while (key != 27) {  //只要没有检测到按下ESC就循环(ESC的ASCII码是27)
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
@@ -171,12 +168,12 @@ int main(int argc, const char** argv)
         else if (key == 'd') {  //按下d，顺时针旋转10°
             angle -= 10;
         }
-        else if (key == 'e')  //按下r，绕给定旋转轴旋转ra°
+        else if (key == 'e')  //按下e，绕给定旋转轴旋转ra°
         {
             rFlag = true;
             rangle += ra;
         }
-        else if (key == 'q')  //按下r，绕给定旋转轴反向旋转ra°
+        else if (key == 'q')  //按下q，绕给定旋转轴反向旋转ra°
         {
             rFlag = true;
             rangle -= ra;
