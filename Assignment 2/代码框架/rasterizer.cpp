@@ -145,6 +145,8 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
                 std::tie(alpha,beta,gamma) = baryc;
                 float w_normalized = 1.0f/(alpha/v[0].w()+beta/v[1].w()+gamma/v[2].w());
                 float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z()/v[1].w() + gamma * v[2].z()/v[2].w();
+                // float w_normalized = 1.0f/(alpha+beta+gamma);
+                // float z_interpolated = alpha * v[0].z()+beta*v[1].z()+gamma*v[2].z();
                 z_interpolated *= w_normalized;
                 if(z_interpolated > depth_buf[get_index(i,j)])
                 {
@@ -187,7 +189,7 @@ void rst::rasterizer::clear(rst::Buffers buff)
     }
     if ((buff & rst::Buffers::Depth) == rst::Buffers::Depth)
     {
-        std::fill(depth_buf.begin(), depth_buf.end(), std::numeric_limits<float>::lowest());
+        std::fill(depth_buf.begin(), depth_buf.end(), -std::numeric_limits<float>::infinity());
     }
 }
 
