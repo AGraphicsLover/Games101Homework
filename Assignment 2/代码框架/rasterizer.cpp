@@ -134,29 +134,60 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     max_x = std::ceil(max_x);
     max_y = std::ceil(max_y);
 
+    std::vector<float> s{0.25,0.25,0.75,0.75,0.25}; //存储4个采样点
+    //该部分代码为4倍MSAA采样
     for(int i=(int)min_x;i<(int)max_x;i++)
     {
         for (int j=(int)min_y;j<(int)max_y; j++)
         {
-            if(insideTriangle(float(i+0.5),float(j+0.5),t.v))
+            int count =0;
+            float maxDepth = -std::numeric_limits<float>::infinity();
+            for (int k = 0; k < 4; k++)
             {
-                float alpha, beta, gamma;
-                auto baryc = computeBarycentric2D(float(i+0.5),float(j+0.5),t.v);
-                std::tie(alpha,beta,gamma) = baryc;
-                float w_normalized = 1.0f/(alpha/v[0].w()+beta/v[1].w()+gamma/v[2].w());
-                float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z()/v[1].w() + gamma * v[2].z()/v[2].w();
-                // float w_normalized = 1.0f/(alpha+beta+gamma);
-                // float z_interpolated = alpha * v[0].z()+beta*v[1].z()+gamma*v[2].z();
-                z_interpolated *= w_normalized;
-                if(z_interpolated > depth_buf[get_index(i,j)])
+                if (insideTriangle(float(i)+s[k],float(j)+s[k+1],t.v))
                 {
-                    depth_buf[get_index(i,j)] = z_interpolated;
-                    set_pixel(Eigen::Vector3f((float)i,(float)j,z_interpolated),t.getColor());
+                    float alpha, beta, gamma;
+                    auto baryc = computeBarycentric2D(float(i)+s[k],float(j)+s[k+1],t.v);
+                    std::tie(alpha,beta,gamma) = baryc;
+                    float w_normalized = 1.0f/(alpha/v[0].w()+beta/v[1].w()+gamma/v[2].w());
+                    float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z()/v[1].w() + gamma * v[2].z()/v[2].w();
+                    z_interpolated *= w_normalized;
+                    maxDepth = std::max(maxDepth,z_interpolated);
+                    count++;
                 }
+                
+            }
+            if(maxDepth > depth_buf[get_index(i,j)])
+            {
+                depth_buf[get_index(i,j)] = maxDepth;
+                set_pixel(Eigen::Vector3f((float)i,(float)j,maxDepth),t.getColor()*count/4);
             }
         }
-        
     }
+    //该部分代码为普通采样（1倍采样）
+    // for(int i=(int)min_x;i<(int)max_x;i++)
+    // {
+    //     for (int j=(int)min_y;j<(int)max_y; j++)
+    //     {
+    //         if(insideTriangle(float(i+0.5),float(j+0.5),t.v))
+    //         {
+    //             float alpha, beta, gamma;
+    //             auto baryc = computeBarycentric2D(float(i+0.5),float(j+0.5),t.v);
+    //             std::tie(alpha,beta,gamma) = baryc;
+    //             float w_normalized = 1.0f/(alpha/v[0].w()+beta/v[1].w()+gamma/v[2].w());
+    //             float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z()/v[1].w() + gamma * v[2].z()/v[2].w();
+    //             // float w_normalized = 1.0f/(alpha+beta+gamma);
+    //             // float z_interpolated = alpha * v[0].z()+beta*v[1].z()+gamma*v[2].z();
+    //             z_interpolated *= w_normalized;
+    //             if(z_interpolated > depth_buf[get_index(i,j)])
+    //             {
+    //                 depth_buf[get_index(i,j)] = z_interpolated;
+    //                 set_pixel(Eigen::Vector3f((float)i,(float)j,z_interpolated),t.getColor());
+    //             }
+    //         }
+    //     }
+        
+    // }
     // If so, use the following code to get the interpolated z value.
     //auto[alpha, beta, gamma] = computeBarycentric2D(x, y, t.v);
     //float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
