@@ -11,6 +11,22 @@ bool rayTriangleIntersect(const Vector3f& v0, const Vector3f& v1, const Vector3f
     // that's specified bt v0, v1 and v2 intersects with the ray (whose
     // origin is *orig* and direction is *dir*)
     // Also don't forget to update tnear, u and v.
+
+    Vector3f E1 = v1 - v0;
+    Vector3f E2 = v2 - v0;
+    Vector3f S = orig - v0;
+    Vector3f S1 = crossProduct(dir,E2);
+    Vector3f S2 = crossProduct(S,E1);
+
+    float SE = dotProduct(S1,E1);
+    if(SE<=0)
+        return false;
+    tnear = dotProduct(S2,E2)/SE;
+    u = dotProduct(S1,S)/SE;
+    v = dotProduct(S2,dir)/SE;
+
+    if(tnear > 0 && u > 0 && v > 0 && (1.f-u-v>-__FLT_EPSILON__))
+        return true;
     return false;
 }
 
@@ -23,7 +39,7 @@ public:
         for (uint32_t i = 0; i < numTris * 3; ++i)
             if (vertsIndex[i] > maxIndex)
                 maxIndex = vertsIndex[i];
-        maxIndex += 1;
+        maxIndex += 1;  //得到总共的三角形顶点数
         vertices = std::unique_ptr<Vector3f[]>(new Vector3f[maxIndex]);
         memcpy(vertices.get(), verts, sizeof(Vector3f) * maxIndex);
         vertexIndex = std::unique_ptr<uint32_t[]>(new uint32_t[numTris * 3]);
