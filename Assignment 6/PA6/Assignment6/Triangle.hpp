@@ -233,9 +233,14 @@ inline Intersection Triangle::getIntersection(Ray ray)
 
     // TODO find ray triangle intersection
 
-
-
-
+    if (t_tmp < 0)
+        return inter;
+    inter.distance = t_tmp;//光线经过的时间
+    inter.happened = true;//是否与三角形相交
+    inter.m = m;//三角形的材质
+    inter.obj = this;
+    inter.normal = normal;//三角形面的法线
+    inter.coords = ray(t_tmp);
     return inter;
 }
 
