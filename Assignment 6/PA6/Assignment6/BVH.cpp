@@ -198,23 +198,23 @@ Intersection BVHAccel::Intersect(const Ray& ray) const
 Intersection BVHAccel::getIntersection(BVHBuildNode* node, const Ray& ray) const
 {
     // TODO Traverse the BVH to find intersection
-    Vector3f invDir(1.f / ray.direction.x, 1.f / ray.direction.y, 1.f / ray.direction.z);
 
-    std::array<int, 3> dirIsNeg;
-    dirIsNeg[0] = ray.direction.x<0;
-    dirIsNeg[1] = ray.direction.y<0;
-    dirIsNeg[2] = ray.direction.z<0;
+    Intersection inter;
+    std::array<int, 3> dirIsNeg{
+        int (ray.direction.x<0),
+        int (ray.direction.y<0),
+        int (ray.direction.z<0)
+    };
 
     //若光线没有与包围盒相交，返回空
-    if (!node->bounds.IntersectP(ray, invDir, dirIsNeg))
-    {
-        return {};
-    }
+    if (!node->bounds.IntersectP(ray, ray.direction_inv, dirIsNeg))
+        return inter;
 
     //若包围盒为叶节点，测试包围盒内的该物体是否与光线相交
     if (node->left == nullptr && node->right == nullptr)
     {
-        return node->object->getIntersection(ray);
+        inter = node->object->getIntersection(ray);
+        return inter;
     }
     
     //若包围盒为中间节点，则继续递归判断

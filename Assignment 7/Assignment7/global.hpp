@@ -9,6 +9,10 @@
 extern const float  EPSILON;
 const float kInfinity = std::numeric_limits<float>::max();
 
+static std::random_device dev;
+static std::mt19937 rng(dev());
+static std::uniform_real_distribution<float> dist(0.f, 1.f);
+
 inline float clamp(const float &lo, const float &hi, const float &v)
 { return std::max(lo, std::min(hi, v)); }
 
@@ -30,9 +34,7 @@ inline  bool solveQuadratic(const float &a, const float &b, const float &c, floa
 
 inline float get_random_float()
 {
-    std::random_device dev;
-    std::mt19937 rng(dev());
-    std::uniform_real_distribution<float> dist(0.f, 1.f); // distribution in range [1, 6]
+     // distribution in range [1, 6]
 
     return dist(rng);
 }

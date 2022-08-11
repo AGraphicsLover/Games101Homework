@@ -1,0 +1,124 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/AreaLight.hpp
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+Light.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Light.hpp
+global.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/global.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/BVH.hpp
+atomic
+-
+vector
+-
+memory
+-
+ctime
+-
+Object.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Object.hpp
+Ray.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Ray.hpp
+Bounds3.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Bounds3.hpp
+Intersection.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Intersection.hpp
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Bounds3.hpp
+Ray.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Ray.hpp
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+limits
+-
+array
+-
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Intersection.hpp
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+Material.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Material.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Light.hpp
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Material.hpp
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Object.hpp
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+global.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/global.hpp
+Bounds3.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Bounds3.hpp
+Ray.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Ray.hpp
+Intersection.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Intersection.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Ray.hpp
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Renderer.cpp
+fstream
+-
+Scene.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Scene.hpp
+Renderer.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Renderer.hpp
+thread
+-
+mutex
+-
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Renderer.hpp
+Scene.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Scene.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Scene.hpp
+vector
+-
+Vector.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+Object.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Object.hpp
+Light.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Light.hpp
+AreaLight.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/AreaLight.hpp
+BVH.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/BVH.hpp
+Ray.hpp
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Ray.hpp
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/Vector.hpp
+iostream
+-
+cmath
+-
+algorithm
+-
+
+/home/wlh/桌面/图形学/Assignment 7/Assignment7/global.hpp
+iostream
+-
+cmath
+-
+random
+-
+

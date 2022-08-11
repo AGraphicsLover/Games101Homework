@@ -96,41 +96,24 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
     // invDir: ray direction(x,y,z), invDir=(1.0/x,1.0/y,1.0/z), use this because Multiply is faster that Division
     // dirIsNeg: ray direction(x,y,z), dirIsNeg=[int(x>0),int(y>0),int(z>0)], use this to simplify your logic
     // TODO test if ray bound intersects
-    //计算进入x、y、z截面的最早和最晚时间
-
-    float min_x = (pMin.x - ray.origin.x) * invDir[0];
-    float max_x = (pMax.x - ray.origin.x) * invDir[0];
-
-    float min_y = (pMin.y - ray.origin.y) * invDir[1];
-    float max_y = (pMax.y - ray.origin.y) * invDir[1];
-
-    float min_z = (pMin.z - ray.origin.z) * invDir[2];
-    float max_z = (pMax.z - ray.origin.z) * invDir[2];
-
-    //如果方向为负（反向），就交换最早和最晚时间
-    if (dirIsNeg[0])
-    {
-        std::swap(min_x, max_x);
-    }
-
-    if (dirIsNeg[1])
-    {
-        std::swap(min_y, max_y);
-    }
-
-    if (dirIsNeg[2])
-    {
-        std::swap(min_z, max_z);
-    }
-
-    float enter = std::max({min_x,min_y, min_z});
-    float exit = std::min({max_x,max_y, max_z});
-
-    if (enter < exit && exit > __FLT_EPSILON__)
-    {
-        return true;
-    }
-    return false;
+    
+    //光线进入时刻
+    float tEnter = -std::numeric_limits<float>::infinity();
+	// 光线离开时刻
+	float tExit = std::numeric_limits<float>::infinity();
+	for (int i = 0; i < 3; i++)
+	{
+		float min = (pMin[i] - ray.origin[i]) * invDir[i];
+		float max = (pMax[i] - ray.origin[i]) * invDir[i];
+		// 坐标为负的话，需要进行交换
+		if (dirIsNeg[i])
+		{
+			std::swap(min, max);
+		}
+		tEnter = std::max(min, tEnter);
+		tExit = std::min(max, tExit);
+	}
+	return tEnter <= tExit && tExit > -__FLT_EPSILON__;
 }
 
 inline Bounds3 Union(const Bounds3& b1, const Bounds3& b2)
